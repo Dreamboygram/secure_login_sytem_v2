@@ -28,10 +28,10 @@ pip install -r requirements.txt
 copy .env.example .env
 # Edit .env with strong random secrets
 .\.venv\Scripts\python.exe -m flask --app wsgi:app db upgrade
-.\.venv\Scripts\python.exe -m flask --app wsgi:app create-admin --allow-weak-temporary-password
+.\.venv\Scripts\python.exe -m flask --app wsgi:app create-admin --username Cisco
 ```
 
-The bootstrap requires `BOOTSTRAP_TOKEN` in the environment and interactive confirmation. The initial administrator `Cisco` can be created with the user-supplied password `jamalmusiala09` at runtime (via the CLI prompt) when using `--allow-weak-temporary-password`; the account is forced to change the password and enrol in 2FA on first login. Never commit secrets to source control.
+The bootstrap is interactive and requires a `BOOTSTRAP_TOKEN` of at least 24 random characters. It refuses to run if any administrator already exists. Enter a unique password at the hidden prompt; never place passwords in source files, shell history, tickets, or logs. The account is stored with Argon2id, forced to change the password at first login, and required to enrol in 2FA. Remove or rotate `BOOTSTRAP_TOKEN` after the first administrator is created.
 
 ## Testing
 
@@ -46,7 +46,7 @@ The bootstrap requires `BOOTSTRAP_TOKEN` in the environment and interactive conf
 - Set `SESSION_COOKIE_SECURE=true`, `FLASK_ENV=production`, `TRUSTED_PROXY_COUNT=1`.
 - Configure rate limiting with a persistent store if needed (default uses `memory://`).
 - Run migrations with `flask db upgrade` during release (or before first start).
-- Bootstrap the first administrator via CLI with `BOOTSTRAP_TOKEN`.
+- Bootstrap the first administrator with `flask --app wsgi:app create-admin --username Cisco`, enter a strong password at the hidden prompt, then remove or rotate `BOOTSTRAP_TOKEN`.
 
 Gunicorn cannot run natively on Windows; use a Linux host (Render, WSL) for real Gunicorn execution.
 

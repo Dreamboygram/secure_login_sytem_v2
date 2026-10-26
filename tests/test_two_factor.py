@@ -17,7 +17,7 @@ from tests.helpers import get_totp_secret, login_with_password, login_with_totp
 
 def _fixed_totp_time(monkeypatch):
     counter = int(time.time() // 30)
-    monkeypatch.setattr(totp_module.time, "time", lambda: (counter * 30) + 10)
+    monkeypatch.setattr(totp_module, "current_counter", lambda interval=30: counter)
     return counter
 
 
