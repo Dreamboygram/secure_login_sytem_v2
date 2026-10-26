@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Security activity | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">Administration</p>
+      <h1>Security activity</h1>
+      <p class="lede">Latest 200 audit events. Sensitive values such as passwords, tokens, secrets, and hashes are excluded from audit details.</p>
+    </div>
+    <a class="button button-secondary" href="{{ url_for('admin.dashboard') }}">Administration</a>
+  </div>
+
+  <section class="card">
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th scope="col">Time</th>
+            <th scope="col">Action</th>
+            <th scope="col">Actor</th>
+            <th scope="col">Target</th>
+            <th scope="col">Outcome</th>
+            <th scope="col">Source</th>
+            <th scope="col">Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in entries %}
+            <tr>
+              <td class="small nowrap">{{ entry.created_at|utc }}</td>
+              <td><strong>{{ entry.action }}</strong></td>
+              <td class="small">{{ entry.actor.username if entry.actor else 'System' }}</td>
+              <td class="small">{{ entry.target.username if entry.target else '-' }}</td>
+              <td>{{ status_badge('failure' if entry.outcome == 'failure' else 'success') }}</td>
+              <td class="small">{{ entry.ip_address or '-' }}</td>
+              <td>
+                <details>
+                  <summary class="small">View</summary>
+                  <pre class="small mono">{{ entry.details|pretty_json }}</pre>
+                </details>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="7" class="empty-state">No security events recorded.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

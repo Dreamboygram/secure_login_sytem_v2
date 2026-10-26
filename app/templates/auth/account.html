@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_field, status_badge, role_badge %}
+{% block title %}Account security | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">Account</p>
+      <h1>Account security</h1>
+      <p class="lede">Review your account state and manage authentication factors.</p>
+    </div>
+    <a class="button button-secondary" href="{{ url_for('dashboard.index') }}">Back to dashboard</a>
+  </div>
+
+  <div class="grid grid-2">
+    <section class="card">
+      <div class="card-header">
+        <h2>Account information</h2>
+        {{ role_badge(current_user.role_name) }}
+      </div>
+      <div class="card-body">
+        <dl class="detail-list">
+          <div class="detail-row"><dt>Username</dt><dd>{{ current_user.username }}</dd></div>
+          <div class="detail-row"><dt>Email</dt><dd>{{ current_user.email }}</dd></div>
+          <div class="detail-row"><dt>Role</dt><dd>{{ current_user.role_name }}</dd></div>
+          <div class="detail-row"><dt>Status</dt><dd>{{ status_badge(current_user.account_status) }}</dd></div>
+          <div class="detail-row"><dt>Last login</dt><dd>{{ current_user.last_login_at|utc }}</dd></div>
+          <div class="detail-row"><dt>Account created</dt><dd>{{ current_user.created_at|utc }}</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>Password</h2>
+      </div>
+      <div class="card-body">
+        <p>Use a unique password with at least 12 characters. Password changes invalidate other active sessions.</p>
+        <div class="button-row">
+          <a class="button" href="{{ url_for('auth.change_password') }}">Change password</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="card" aria-labelledby="two-factor-heading">
+    <div class="card-header">
+      <h2 id="two-factor-heading">Two-factor authentication</h2>
+      {% if current_user.totp_enabled %}
+        <span class="badge badge-enabled">Enabled</span>
+      {% else %}
+        <span class="badge badge-warning">Not enabled</span>
+      {% endif %}
+    </div>
+    <div class="card-body">
+      {% if current_user.totp_enabled %}
+        <p>Time-based one-time passwords are required at sign-in. Unused recovery codes: <strong>{{ active_recovery_codes }}</strong>.</p>
+        {% if current_user.is_privileged %}
+          <div class="notice notice-info">Two-factor authentication is mandatory for your privileged role and cannot be disabled.</div>
+        {% else %}
+          <div class="notice">
+            Disabling two-factor authentication reduces your account security. Your password and a current code are required.
+          </div>
+          <form method="post" action="{{ url_for('auth.disable_2fa') }}" novalidate>
+            {{ disable_form.hidden_tag() }}
+            <div class="grid grid-2">
+              {{ render_field(disable_form.password, autocomplete="current-password") }}
+              {{ render_field(disable_form.code, autocomplete="one-time-code") }}
+            </div>
+            {{ disable_form.submit(class_="button button-danger") }}
+          </form>
+        {% endif %}
+      {% else %}
+        <p>Add a second authentication factor to protect your account even if your password is compromised.</p>
+        {% if current_user.is_privileged %}
+          <div class="notice notice-danger">Enrolment is mandatory for your privileged role before dashboard access is permitted.</div>
+        {% endif %}
+        <a class="button" href="{{ url_for('auth.setup_2fa') }}">Set up two-factor authentication</a>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% macro render_field(field, autocomplete=None, rows=None, help_text=None) -%}
+  <div class="form-group">
+    {{ field.label }}
+    {% if rows %}
+      {{ field(class_="form-control", rows=rows, autocomplete=autocomplete or "off") }}
+    {% else %}
+      {{ field(class_="form-control", autocomplete=autocomplete or "off") }}
+    {% endif %}
+    {% if help_text %}
+      <p class="form-help">{{ help_text }}</p>
+    {% elif field.description %}
+      <p class="form-help">{{ field.description }}</p>
+    {% endif %}
+    {% if field.errors %}
+      <ul class="field-errors" role="alert">
+        {% for error in field.errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{%- endmacro %}
+
+{% macro status_badge(text) -%}
+  <span class="badge badge-{{ text|lower|replace(' ', '-') }}">{{ text }}</span>
+{%- endmacro %}
+
+{% macro role_badge(name) -%}
+  <span class="badge">{{ name }}</span>
+{%- endmacro %}

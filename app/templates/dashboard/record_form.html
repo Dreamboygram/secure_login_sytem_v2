@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_field %}
+{% block title %}{{ 'Edit record' if record else 'New record' }} | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">INPUTER dashboard</p>
+      <h1>{{ 'Edit record' if record else 'New record' }}</h1>
+      <p class="lede">{{ 'Update the information in this record.' if record else 'Add a new operational record to your account.' }}</p>
+    </div>
+    <a class="button button-secondary" href="{{ url_for('dashboard.records') }}">Back to records</a>
+  </div>
+
+  <section class="card narrow-card">
+    <div class="card-body">
+      <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+        {{ render_field(form.title) }}
+        {{ render_field(form.content, rows=8) }}
+        <div class="form-actions">
+          {{ form.submit(class_="button") }}
+          <a class="button button-secondary" href="{{ url_for('dashboard.records') }}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </section>
+{% endblock %}

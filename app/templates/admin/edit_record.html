@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_field %}
+{% block title %}Edit record | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">Record moderation</p>
+      <h1>Edit record</h1>
+      <p class="lede">Owner: {{ record.owner.username }}. Changes are audited.</p>
+    </div>
+    <a class="button button-secondary" href="{{ url_for('admin.records') }}">Back to records</a>
+  </div>
+
+  <section class="card narrow-card">
+    <div class="card-body">
+      <form method="post" action="{{ url_for('admin.edit_record', record_id=record.id) }}" novalidate>
+        {{ form.hidden_tag() }}
+        {{ render_field(form.title) }}
+        {{ render_field(form.content, rows=8) }}
+        <div class="form-actions">
+          {{ form.submit(class_="button") }}
+          <a class="button button-secondary" href="{{ url_for('admin.records') }}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </section>
+{% endblock %}

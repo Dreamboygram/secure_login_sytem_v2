@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_field %}
+{% block title %}Create account | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="auth-shell">
+    <section class="auth-aside">
+      <p class="eyebrow">New account</p>
+      <h1>Create a protected account.</h1>
+      <p class="lede">Public registration creates an INPUTER account. Higher roles are assigned only by an authorised administrator.</p>
+    </section>
+    <section class="auth-card" aria-labelledby="register-heading">
+      <h2 id="register-heading">Create account</h2>
+      <p>Passwords require at least 12 characters with upper and lower case letters, a number, and a special character.</p>
+      <form method="post" action="{{ url_for('auth.register') }}" novalidate>
+        {{ form.hidden_tag() }}
+        {{ render_field(form.username, autocomplete="username") }}
+        {{ render_field(form.email, autocomplete="email") }}
+        {{ render_field(form.password, autocomplete="new-password") }}
+        {{ render_field(form.confirm_password, autocomplete="new-password") }}
+        {{ form.submit(class_="button button-block") }}
+      </form>
+      <p class="auth-footer">Already registered? <a href="{{ url_for('auth.login') }}">Sign in</a>.</p>
+    </section>
+  </div>
+{% endblock %}

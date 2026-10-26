@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Management reports | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">MANAGER dashboard</p>
+      <h1>Operational reports</h1>
+      <p class="lede">Aggregated operational information from the last 30 days where applicable.</p>
+    </div>
+  </div>
+
+  {% include "_account_summary.html" %}
+
+  <section class="grid grid-4" aria-label="Operational statistics">
+    <article class="card stat">
+      <p class="stat-value">{{ active_users }}</p>
+      <p class="stat-label">Active users</p>
+    </article>
+    <article class="card stat">
+      <p class="stat-value">{{ total_records }}</p>
+      <p class="stat-label">Total records</p>
+    </article>
+    <article class="card stat">
+      <p class="stat-value">{{ records_last_30_days }}</p>
+      <p class="stat-label">Records last 30 days</p>
+    </article>
+    <article class="card stat">
+      <p class="stat-value">{{ recent_logins }}</p>
+      <p class="stat-label">Successful logins, 30 days</p>
+    </article>
+  </section>
+
+  <div class="grid grid-2">
+    <section class="card">
+      <div class="card-header">
+        <h2>Workforce by role</h2>
+      </div>
+      <div class="card-body">
+        {% if role_counts %}
+          <table class="data">
+            <thead>
+              <tr><th scope="col">Role</th><th scope="col">Accounts</th></tr>
+            </thead>
+            <tbody>
+              {% for role_name, count in role_counts %}
+                <tr><td>{{ role_name }}</td><td>{{ count }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="empty-state">No account data available.</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>Recent records</h2>
+      </div>
+      <div class="card-body">
+        {% if recent_records %}
+          <ul class="list-plain">
+            {% for record in recent_records %}
+              <li>
+                <strong>{{ record.title }}</strong>
+                <div class="small muted">{{ record.owner.username }} &middot; {{ record.created_at|utc }}</div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="empty-state">No records available for this report.</p>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+{% endblock %}

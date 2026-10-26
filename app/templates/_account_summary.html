@@ -1,0 +1,33 @@
+{% from "_macros.html" import status_badge, role_badge %}
+<section class="card" aria-label="Your account summary">
+  <div class="card-body">
+    <dl class="summary-strip">
+      <div>
+        <dt>Signed in as</dt>
+        <dd>{{ current_user.username }}</dd>
+      </div>
+      <div>
+        <dt>Role</dt>
+        <dd>{{ role_badge(current_user.role_name) }}</dd>
+      </div>
+      <div>
+        <dt>Account status</dt>
+        <dd>{{ status_badge(current_user.account_status) }}</dd>
+      </div>
+      <div>
+        <dt>Last login</dt>
+        <dd class="small">{{ current_user.last_login_at|utc }}</dd>
+      </div>
+      <div>
+        <dt>Two-factor</dt>
+        <dd>
+          {% if current_user.totp_enabled %}
+            <span class="badge badge-enabled">Enabled</span>
+          {% else %}
+            <span class="badge badge-warning">Not enabled</span>
+          {% endif %}
+        </dd>
+      </div>
+    </dl>
+  </div>
+</section>

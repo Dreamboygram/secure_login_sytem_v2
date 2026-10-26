@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Administration | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">Administration</p>
+      <h1>Administrative dashboard</h1>
+      <p class="lede">Oversight of accounts, access, and security activity. Your available actions are determined by server-side permissions.</p>
+    </div>
+    <div class="button-row">
+      {% if current_user.has_permission('users.view') %}
+        <a class="button button-secondary" href="{{ url_for('admin.users') }}">User directory</a>
+      {% endif %}
+      {% if current_user.has_permission('users.manage') %}
+        <a class="button" href="{{ url_for('admin.create_user') }}">Create user</a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% include "_account_summary.html" %}
+
+  <section class="grid grid-4" aria-label="Account statistics">
+    <article class="card stat">
+      <p class="stat-value">{{ active_users }}</p>
+      <p class="stat-label">Active users</p>
+    </article>
+    <article class="card stat">
+      <p class="stat-value">{{ locked_users }}</p>
+      <p class="stat-label">Currently locked</p>
+    </article>
+    <article class="card stat">
+      <p class="stat-value">{{ two_factor_users }}</p>
+      <p class="stat-label">2FA enrolled</p>
+    </article>
+    <article class="card stat">
+      <p class="stat-value">{{ current_user.role.rank }}</p>
+      <p class="stat-label">Your access rank</p>
+    </article>
+  </section>
+
+  <div class="grid grid-2">
+    <section class="card">
+      <div class="card-header">
+        <h2>Administrative tools</h2>
+      </div>
+      <div class="card-body">
+        <div class="button-row">
+          {% if current_user.has_permission('users.view') %}
+            <a class="button button-secondary" href="{{ url_for('admin.users') }}">Manage users</a>
+          {% endif %}
+          {% if current_user.has_permission('audit.view') %}
+            <a class="button button-secondary" href="{{ url_for('admin.audit_log') }}">Security activity</a>
+          {% endif %}
+          {% if current_user.has_permission('records.moderate') %}
+            <a class="button button-secondary" href="{{ url_for('admin.records') }}">Moderate records</a>
+          {% endif %}
+          <a class="button button-secondary" href="{{ url_for('auth.account') }}">Account security</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>Recent security activity</h2>
+        {% if current_user.has_permission('audit.view') %}
+          <a class="small" href="{{ url_for('admin.audit_log') }}">View all</a>
+        {% endif %}
+      </div>
+      <div class="card-body">
+        {% if recent_events %}
+          <ul class="list-plain">
+            {% for event in recent_events %}
+              <li>
+                <div class="button-row">
+                  <strong>{{ event.action }}</strong>
+                  {{ status_badge('failure' if event.outcome == 'failure' else 'success') }}
+                </div>
+                <span class="small muted">{{ event.created_at|utc }}{% if event.actor %} &middot; {{ event.actor.username }}{% endif %}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="empty-state">No recorded activity yet.</p>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+{% endblock %}

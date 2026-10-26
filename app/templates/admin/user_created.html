@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}User created | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">Account created</p>
+      <h1>Temporary credentials</h1>
+      <p class="lede">Deliver these credentials through a secure channel. This password is displayed once and is not stored in plaintext.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <section class="card">
+      <div class="card-header">
+        <h2>{{ created_user.username }}</h2>
+        <span class="badge badge-warning">One-time display</span>
+      </div>
+      <div class="card-body">
+        <dl class="detail-list">
+          <div class="detail-row"><dt>Email</dt><dd>{{ created_user.email }}</dd></div>
+          <div class="detail-row"><dt>Role</dt><dd>{{ created_user.role_name }}</dd></div>
+          <div class="detail-row"><dt>Temporary password</dt><dd><code class="secret-value" id="temporary-password">{{ temporary_password }}</code></dd></div>
+        </dl>
+        <div class="button-row">
+          <button class="button button-small button-secondary" type="button" data-copy-target="temporary-password">Copy password</button>
+          <a class="button" href="{{ url_for('admin.users') }}">Return to user directory</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="card card-tint">
+      <div class="card-body">
+        <h2>Required at first sign-in</h2>
+        <ol class="steps">
+          <li>Change the temporary password.</li>
+          <li>Complete two-factor authentication setup if the role requires it.</li>
+          <li>Use the normal account-security page for future changes.</li>
+        </ol>
+        <div class="notice notice-danger">The temporary password is not recoverable after you leave this page.</div>
+      </div>
+    </section>
+  </div>
+{% endblock %}

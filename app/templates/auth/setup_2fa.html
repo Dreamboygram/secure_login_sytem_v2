@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_field %}
+{% block title %}Set up two-factor authentication | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">Account security</p>
+      <h1>Set up two-factor authentication</h1>
+      <p class="lede">Privileged roles must enrol before accessing their dashboard. Use Google Authenticator, Microsoft Authenticator, or another TOTP-compatible app.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <section class="card">
+      <div class="card-header">
+        <h2>1. Scan the QR code</h2>
+      </div>
+      <div class="card-body">
+        <div class="qr-panel">
+          <img src="{{ qr_uri }}" alt="Two-factor authentication setup QR code" width="260" height="260">
+          <p class="small muted">If you cannot scan the code, enter this key manually:</p>
+          <code class="secret-value">{{ manual_secret }}</code>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>2. Confirm your code</h2>
+      </div>
+      <div class="card-body">
+        <ol class="steps">
+          <li>Add the account to your authenticator app.</li>
+          <li>Enter the current six-digit code below.</li>
+          <li>Store the recovery codes shown on the next screen securely.</li>
+        </ol>
+        <form method="post" action="{{ url_for('auth.setup_2fa') }}" novalidate>
+          {{ form.hidden_tag() }}
+          {{ render_field(form.code, autocomplete="one-time-code") }}
+          {{ form.submit(class_="button") }}
+        </form>
+      </div>
+    </section>
+  </div>
+{% endblock %}

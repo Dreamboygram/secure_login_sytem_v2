@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>{% block title %}{{ app_name }}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <header class="site-header">
+      <div class="container nav-shell">
+        <a class="brand" href="{{ url_for('dashboard.index') if current_user.is_authenticated else url_for('public.home') }}">
+          <span class="brand-mark" aria-hidden="true">SL</span>
+          <span>{{ app_name }}</span>
+        </a>
+        <button
+          class="nav-toggle"
+          type="button"
+          data-nav-toggle
+          aria-expanded="false"
+          aria-controls="primary-navigation"
+        >
+          Menu
+        </button>
+        <nav id="primary-navigation" class="nav-links" aria-label="Primary" data-nav-links>
+          {% if current_user.is_authenticated %}
+            <a href="{{ url_for('dashboard.index') }}" {% if request.endpoint == 'dashboard.index' %}aria-current="page"{% endif %}>Dashboard</a>
+            {% if current_user.has_permission('records.view_own') %}
+              <a href="{{ url_for('dashboard.records') }}" {% if request.endpoint and request.endpoint.startswith('dashboard.') and 'record' in request.endpoint %}aria-current="page"{% endif %}>My records</a>
+            {% endif %}
+            {% if current_user.has_permission('reports.view') %}
+              <a href="{{ url_for('dashboard.reports') }}" {% if request.endpoint == 'dashboard.reports' %}aria-current="page"{% endif %}>Reports</a>
+            {% endif %}
+            {% if current_user.has_permission('admin.view') %}
+              <a href="{{ url_for('admin.dashboard') }}" {% if request.endpoint and request.endpoint.startswith('admin.') %}aria-current="page"{% endif %}>Administration</a>
+            {% endif %}
+            <a href="{{ url_for('auth.account') }}" {% if request.endpoint == 'auth.account' %}aria-current="page"{% endif %}>Account security</a>
+            <form method="post" action="{{ url_for('auth.logout') }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit">Sign out</button>
+            </form>
+          {% else %}
+            <a href="{{ url_for('auth.login') }}" {% if request.endpoint == 'auth.login' %}aria-current="page"{% endif %}>Sign in</a>
+            <a href="{{ url_for('auth.register') }}" {% if request.endpoint == 'auth.register' %}aria-current="page"{% endif %}>Create account</a>
+          {% endif %}
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content" class="container main-content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-stack" aria-live="polite">
+            {% for category, message in messages %}
+              <div class="flash flash-{{ category if category in ['success', 'error', 'warning', 'info'] else 'info' }}" role="status">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <span>&copy; {{ current_year }} {{ app_name }}</span>
+        <span>Security-first authentication and account administration</span>
+      </div>
+    </footer>
+  </body>
+</html>

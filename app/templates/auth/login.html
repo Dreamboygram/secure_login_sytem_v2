@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_field %}
+{% block title %}Sign in | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="auth-shell">
+    <section class="auth-aside">
+      <p class="eyebrow">Welcome back</p>
+      <h1>Sign in securely.</h1>
+      <p class="lede">Privileged accounts complete a second verification step before entering the dashboard. Failed attempts are rate limited and recorded.</p>
+    </section>
+    <section class="auth-card" aria-labelledby="login-heading">
+      <h2 id="login-heading">Sign in</h2>
+      <p>Use your username or email address.</p>
+      <form method="post" action="{{ url_for('auth.login', next=next_url) if next_url else url_for('auth.login') }}" novalidate>
+        {{ form.hidden_tag() }}
+        {% if next_url %}
+          <input type="hidden" name="next" value="{{ next_url }}">
+        {% endif %}
+        {{ render_field(form.identifier, autocomplete="username") }}
+        {{ render_field(form.password, autocomplete="current-password") }}
+        {{ form.submit(class_="button button-block") }}
+      </form>
+      <p class="auth-footer">New here? <a href="{{ url_for('auth.register') }}">Create an account</a>.</p>
+    </section>
+  </div>
+{% endblock %}

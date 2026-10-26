@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, role_badge %}
+{% block title %}Users | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">Administration</p>
+      <h1>User directory</h1>
+      <p class="lede">Role and account changes are validated on the server. Higher-privilege accounts cannot be modified by lower-privilege users.</p>
+    </div>
+    <div class="button-row">
+      <a class="button button-secondary" href="{{ url_for('admin.dashboard') }}">Administration</a>
+      {% if current_user.has_permission('users.manage') %}
+        <a class="button" href="{{ url_for('admin.create_user') }}">Create user</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <section class="card">
+    <div class="card-header">
+      <h2>Accounts</h2>
+      <span class="small muted">{{ users|length }} total</span>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th scope="col">User</th>
+            <th scope="col">Role</th>
+            <th scope="col">Status</th>
+            <th scope="col">2FA</th>
+            <th scope="col">Last login</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+            <tr>
+              <td>
+                <strong>{{ user.username }}</strong>
+                <div class="small muted">{{ user.email }}</div>
+              </td>
+              <td>{{ role_badge(user.role_name) }}</td>
+              <td>{{ status_badge(user.account_status) }}</td>
+              <td>
+                {% if user.totp_enabled %}
+                  <span class="badge badge-enabled">Enabled</span>
+                {% else %}
+                  <span class="badge badge-warning">Not set</span>
+                {% endif %}
+              </td>
+              <td class="small">{{ user.last_login_at|utc }}</td>
+              <td>
+                {% if current_user.has_permission('users.manage') %}
+                  {% if user.id == current_user.id %}
+                    <a class="button button-small button-secondary" href="{{ url_for('auth.account') }}">Your account</a>
+                  {% elif user.role.rank > current_user.role.rank %}
+                    <span class="small muted">Protected</span>
+                  {% else %}
+                    <div class="table-actions">
+                      <form method="post" action="{{ url_for('admin.toggle_user', user_id=user.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="button button-small button-secondary" type="submit">
+                          {{ 'Deactivate' if user.is_active else 'Activate' }}
+                        </button>
+                      </form>
+                      <form method="post" action="{{ url_for('admin.change_role', user_id=user.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <label class="visually-hidden" for="role-{{ user.id }}">Role for {{ user.username }}</label>
+                        <select class="inline-select" id="role-{{ user.id }}" name="role_id">
+                          {% for role in available_roles %}
+                            <option value="{{ role.id }}" {% if role.id == user.role_id %}selected{% endif %}>{{ role.name }}</option>
+                          {% endfor %}
+                        </select>
+                        <button class="button button-small button-secondary" type="submit">Set</button>
+                      </form>
+                      <a class="button button-small button-secondary" href="{{ url_for('admin.reset_password', user_id=user.id) }}">Reset password</a>
+                      <a class="button button-small button-secondary" href="{{ url_for('admin.reset_two_factor', user_id=user.id) }}">Reset 2FA</a>
+                    </div>
+                  {% endif %}
+                {% else %}
+                  <span class="small muted">Read only</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6" class="empty-state">No user accounts found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

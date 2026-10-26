@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Record moderation | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">Administration</p>
+      <h1>Record moderation</h1>
+      <p class="lede">Review and update operational records within your permitted scope. Every moderation action is audited.</p>
+    </div>
+    <a class="button button-secondary" href="{{ url_for('admin.dashboard') }}">Administration</a>
+  </div>
+
+  <section class="card">
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th scope="col">Record</th>
+            <th scope="col">Owner</th>
+            <th scope="col">Created</th>
+            <th scope="col">Updated</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for record in records %}
+            <tr>
+              <td>
+                <strong>{{ record.title }}</strong>
+                <div class="small muted">{{ record.content|truncate(90) }}</div>
+              </td>
+              <td class="small">{{ record.owner.username }}</td>
+              <td class="small nowrap">{{ record.created_at|utc }}</td>
+              <td class="small nowrap">{{ record.updated_at|utc }}</td>
+              <td><a class="button button-small button-secondary" href="{{ url_for('admin.edit_record', record_id=record.id) }}">Edit</a></td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="5" class="empty-state">No operational records exist.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

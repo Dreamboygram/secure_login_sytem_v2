@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Recovery codes | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">Two-factor enabled</p>
+      <h1>Store your recovery codes now</h1>
+      <p class="lede">Each code can be used once if your authenticator device is unavailable. These codes will not be displayed again.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <section class="card">
+      <div class="card-header">
+        <h2>Recovery codes</h2>
+        <span class="badge badge-warning">One-time display</span>
+      </div>
+      <div class="card-body">
+        <div class="notice notice-danger">
+          Keep these codes offline in a secure location. Do not email, message, or photograph them.
+        </div>
+        <ul class="recovery-grid" aria-label="Two-factor recovery codes">
+          {% for code in recovery_codes %}
+            <li><code>{{ code }}</code></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+
+    <section class="card card-tint">
+      <div class="card-body">
+        <h2>Next steps</h2>
+        <p>Two-factor authentication is now required whenever you sign in. Recovery codes are consumed after one successful use.</p>
+        <div class="button-row">
+          <a class="button" href="{{ url_for('dashboard.index') }}">Open dashboard</a>
+          <a class="button button-secondary" href="{{ url_for('auth.account') }}">Account security</a>
+        </div>
+      </div>
+    </section>
+  </div>
+{% endblock %}

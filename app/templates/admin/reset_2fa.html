@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_field %}
+{% block title %}Reset two-factor authentication | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">Controlled recovery</p>
+      <h1>Reset 2FA for {{ target.username }}</h1>
+      <p class="lede">All TOTP material and recovery codes for the target account will be removed. Privileged accounts must enrol again at next sign-in.</p>
+    </div>
+    <a class="button button-secondary" href="{{ url_for('admin.users') }}">Back to users</a>
+  </div>
+
+  <section class="card narrow-card">
+    <div class="card-body">
+      <div class="notice notice-danger">
+        This is a security-sensitive action. Re-authenticate and record a reason. The target account's sessions will be invalidated.
+      </div>
+      <form method="post" action="{{ url_for('admin.reset_two_factor', user_id=target.id) }}" novalidate>
+        {{ form.hidden_tag() }}
+        {{ render_field(form.current_password, autocomplete="current-password") }}
+        {{ render_field(form.reason, rows=3) }}
+        <div class="form-actions">
+          {{ form.submit(class_="button button-danger") }}
+          <a class="button button-secondary" href="{{ url_for('admin.users') }}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </section>
+{% endblock %}

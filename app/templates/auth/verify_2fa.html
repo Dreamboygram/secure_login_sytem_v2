@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_field %}
+{% block title %}Two-factor verification | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="auth-shell">
+    <section class="auth-aside">
+      <p class="eyebrow">Second factor</p>
+      <h1>Verify your identity.</h1>
+      <p class="lede">Enter the current six-digit code from your authenticator app. If your device is unavailable, use one unused recovery code.</p>
+    </section>
+    <section class="auth-card" aria-labelledby="verify-heading">
+      <h2 id="verify-heading">Two-factor verification</h2>
+      <p>This challenge expires five minutes after your password is accepted.</p>
+      <form method="post" action="{{ url_for('auth.verify_2fa') }}" novalidate>
+        {{ form.hidden_tag() }}
+        {{ render_field(form.code, autocomplete="one-time-code", help_text="Example: 123456 or ABCDE-12345-FGHIJ-67890") }}
+        {{ form.submit(class_="button button-block") }}
+      </form>
+      <p class="auth-footer"><a href="{{ url_for('auth.login') }}">Return to sign in</a></p>
+    </section>
+  </div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_field %}
+{% block title %}Create user | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">Administration</p>
+      <h1>Create user</h1>
+      <p class="lede">A one-time temporary password will be generated and displayed once. The user must change it at first sign-in.</p>
+    </div>
+    <a class="button button-secondary" href="{{ url_for('admin.users') }}">Back to users</a>
+  </div>
+
+  <section class="card narrow-card">
+    <div class="card-body">
+      <form method="post" action="{{ url_for('admin.create_user') }}" novalidate>
+        {{ form.hidden_tag() }}
+        {{ render_field(form.username, autocomplete="off") }}
+        {{ render_field(form.email, autocomplete="off") }}
+        {{ render_field(form.role_id) }}
+        <div class="notice notice-info">
+          Privileged roles must also complete two-factor authentication before accessing their dashboard.
+        </div>
+        <div class="form-actions">
+          {{ form.submit(class_="button") }}
+          <a class="button button-secondary" href="{{ url_for('admin.users') }}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </section>
+{% endblock %}

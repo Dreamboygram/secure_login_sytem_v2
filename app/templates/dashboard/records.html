@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}My records | {{ app_name }}{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">INPUTER dashboard</p>
+      <h1>My records</h1>
+      <p class="lede">Create and maintain the operational records assigned to your account.</p>
+    </div>
+    <a class="button" href="{{ url_for('dashboard.new_record') }}">New record</a>
+  </div>
+
+  {% include "_account_summary.html" %}
+
+  <section class="card">
+    <div class="card-header">
+      <h2>Your records</h2>
+      <span class="small muted">{{ records|length }} total</span>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Details</th>
+            <th scope="col">Updated</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for record in records %}
+            <tr>
+              <td><strong>{{ record.title }}</strong></td>
+              <td class="small">{{ record.content|truncate(130) }}</td>
+              <td class="small nowrap">{{ record.updated_at|utc }}</td>
+              <td><a class="button button-small button-secondary" href="{{ url_for('dashboard.edit_record', record_id=record.id) }}">Edit</a></td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="4" class="empty-state">You have not created any records yet.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}
