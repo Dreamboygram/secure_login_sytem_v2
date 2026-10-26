@@ -20,6 +20,7 @@ from flask import (
 from flask_login import current_user, login_required, login_user, logout_user
 from sqlalchemy import func, or_
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.orm import lazyload
 
 from app.auth.forms import (
     ChangePasswordForm,
@@ -421,7 +422,11 @@ def verify_2fa():
     form = TwoFactorForm()
     if form.validate_on_submit():
         user = db.session.scalar(
-            db.select(User).where(User.id == int(pending_id)).with_for_update()
+            db.select(User)
+            .where(User.id == int(pending_id))
+            .options(lazyload(User.role))
+            .with_for_update(of=User)
+            .execution_options(populate_existing=True)
         )
         if user is None or not user.totp_enabled or not user.totp_secret_enc:
             session.clear()

@@ -39,6 +39,13 @@ The bootstrap is interactive and requires a `BOOTSTRAP_TOKEN` of at least 24 ran
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
+The PostgreSQL 2FA regression test runs only when `TEST_POSTGRES_URL` is set. It creates and drops an isolated schema, so it never touches the public schema. Point it at a dedicated test database:
+
+```powershell
+$env:TEST_POSTGRES_URL = "<postgresql-connection-url>"
+.\.venv\Scripts\python.exe -m pytest -q tests/test_postgres_2fa.py
+```
+
 ## Deployment (Render)
 
 `render.yaml` is included for manual blueprint deployment. Do not commit secrets. Set strong values for all secrets in the Render environment. In production:
