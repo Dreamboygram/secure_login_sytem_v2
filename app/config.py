@@ -6,6 +6,9 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from sqlalchemy.engine import make_url
+from sqlalchemy.exc import ArgumentError
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 INSTANCE_DIR = BASE_DIR / "instance"
 
@@ -62,8 +65,17 @@ def _secret(name: str, minimum_length: int = 32) -> str:
     return value
 
 
-def _normalise_database_url(url: str, *, production: bool) -> str:
+def _clean_database_url(url: str) -> str:
     value = url.strip()
+    if value.startswith("\ufeff"):
+        value = value.lstrip("\ufeff").strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+        value = value[1:-1].strip()
+    return value
+
+
+def _normalise_database_url(url: str, *, production: bool) -> str:
+    value = _clean_database_url(url)
     if value.startswith("postgres://"):
         value = "postgresql+psycopg://" + value[len("postgres://") :]
     elif value.startswith("postgresql://"):
@@ -76,6 +88,14 @@ def _normalise_database_url(url: str, *, production: bool) -> str:
             )
     elif not value:
         raise ConfigurationError("DATABASE_URL must not be empty.")
+
+    try:
+        make_url(value)
+    except (ArgumentError, ValueError) as exc:
+        raise ConfigurationError(
+            "DATABASE_URL is not a valid database URL. Check for surrounding quotes "
+            "or hidden characters in the environment variable."
+        ) from exc
     return value
 
 
